@@ -200,7 +200,7 @@ export default async function run({ github, context, dryRun = false }) {
     const cutoff = new Date();
     cutoff.setUTCMonth(cutoff.getUTCMonth() - 3);
     return builds.filter((build) => {
-      const isExperimental = build.build_number.startsWith("cataclysm-tlg-1.0-");
+      const isExperimental = true;//build.build_number.startsWith("cataclysm-tlg-1.0-");
       const isStableRelease = !isExperimental && !build.prerelease;
       if (isStableRelease) return true;
       const createdAt = new Date(build.created_at);
@@ -321,77 +321,77 @@ export default async function run({ github, context, dryRun = false }) {
       await createBlob("data/latest.gz/all.json", zlib.gzipSync(allJson));
       await createBlob("data/latest.gz/all_mods.json", zlib.gzipSync(allModsJson));
     }
-
-    console.group("Downloading translations...");
-
-    const translationArtifacts = await github.rest.actions.listArtifactsForRepo({
-      owner: "Cataclysm-TLG",
-      repo: "Cataclysm-TLG",
-      name: "translations",
-      per_page: 100
-    });
-
-    const relevantTranslationArtifact = translationArtifacts.data.artifacts.find(a => a.workflow_run?.head_sha === release.target_commitish)
-
-    let langs = []
-    if (relevantTranslationArtifact) {
-      console.log("Found translations")
-
-      const { data: zip } = await github.rest.actions.downloadArtifact({
-        owner: "Cataclysm-TLG",
-        repo: "Cataclysm-TLG",
-        artifact_id: relevantTranslationArtifact.id,
-        archive_format: "zip"
-      });
-      // @ts-expect-error
-      const zBuf = Buffer.from(zip)
-      const globFn = glob(zBuf);
-      langs = await Promise.all(
-        [...globFn("lang/po/*.po")].map(async (f) => {
-          const lang = path.basename(f.name, ".po");
-          const json = postprocessPoJson(
-            po2json.parse(f.data()),
-          );
-          const jsonStr = JSON.stringify(json);
-          await createBlob(`${pathBase}/lang/${lang}.json`, jsonStr);
-          if (tag_name === latestRelease)
-            await createBlob(
-              `data/latest.gz/lang/${lang}.json`,
-              zlib.gzipSync(jsonStr),
-            );
-
-          // To support searching Chinese translations by pinyin
-          if (lang.startsWith("zh_")) {
-            const pinyin = toPinyin(data, json);
-            const pinyinStr = JSON.stringify(pinyin);
-            await createBlob(`${pathBase}/lang/${lang}_pinyin.json`, pinyinStr);
-            if (tag_name === latestRelease)
-              await createBlob(
-                `data/latest.gz/lang/${lang}_pinyin.json`,
-                zlib.gzipSync(pinyinStr),
-              );
-          }
-          return lang;
-        }),
-      );
-      console.log(`Found ${Object.keys(langs).length} languages.`);
-    } else {
-      console.log(`No translation artifact found for ${release.target_commitish}`)
-    }
-
-    console.groupEnd();
-
+    //
+    // console.group("Downloading translations...");
+    //
+    // const translationArtifacts = await github.rest.actions.listArtifactsForRepo({
+    //   owner: "Cataclysm-TLG",
+    //   repo: "Cataclysm-TLG",
+    //   name: "translations",
+    //   per_page: 100
+    // });
+    //
+    // const relevantTranslationArtifact = translationArtifacts.data.artifacts.find(a => a.workflow_run?.head_sha === release.target_commitish)
+    //
+    // let langs = []
+    // if (relevantTranslationArtifact) {
+    //   console.log("Found translations")
+    //
+    //   const { data: zip } = await github.rest.actions.downloadArtifact({
+    //     owner: "Cataclysm-TLG",
+    //     repo: "Cataclysm-TLG",
+    //     artifact_id: relevantTranslationArtifact.id,
+    //     archive_format: "zip"
+    //   });
+    //   // @ts-expect-error
+    //   const zBuf = Buffer.from(zip)
+    //   const globFn = glob(zBuf);
+    //   langs = await Promise.all(
+    //     [...globFn("lang/po/*.po")].map(async (f) => {
+    //       const lang = path.basename(f.name, ".po");
+    //       const json = postprocessPoJson(
+    //         po2json.parse(f.data()),
+    //       );
+    //       const jsonStr = JSON.stringify(json);
+    //       await createBlob(`${pathBase}/lang/${lang}.json`, jsonStr);
+    //       if (tag_name === latestRelease)
+    //         await createBlob(
+    //           `data/latest.gz/lang/${lang}.json`,
+    //           zlib.gzipSync(jsonStr),
+    //         );
+    //
+    //       // To support searching Chinese translations by pinyin
+    //       if (lang.startsWith("zh_")) {
+    //         const pinyin = toPinyin(data, json);
+    //         const pinyinStr = JSON.stringify(pinyin);
+    //         await createBlob(`${pathBase}/lang/${lang}_pinyin.json`, pinyinStr);
+    //         if (tag_name === latestRelease)
+    //           await createBlob(
+    //             `data/latest.gz/lang/${lang}_pinyin.json`,
+    //             zlib.gzipSync(pinyinStr),
+    //           );
+    //       }
+    //       return lang;
+    //     }),
+    //   );
+    //   console.log(`Found ${Object.keys(langs).length} languages.`);
+    // } else {
+    //   console.log(`No translation artifact found for ${release.target_commitish}`)
+    // }
+    //
+    // console.groupEnd();
+    //
     newBuilds.push({
       build_number: tag_name,
       prerelease: release.prerelease,
       created_at: release.created_at,
-      langs,
+      langs: []
     });
     console.groupEnd();
   }
 
   const allBuilds = existingAllBuilds.concat(newBuilds);
-  allBuilds.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  // allBuilds.sort((a, b) => b.created_at.localeCompare(a.created_at));
   const importantBuilds = filterImportantBuilds(allBuilds);
 
   const allBuildsJson = JSON.stringify(allBuilds);
