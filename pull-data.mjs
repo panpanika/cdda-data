@@ -200,7 +200,7 @@ export default async function run({ github, context, dryRun = false }) {
     const cutoff = new Date();
     cutoff.setUTCMonth(cutoff.getUTCMonth() - 3);
     return builds.filter((build) => {
-      const isExperimental = true;//build.build_number.startsWith("cataclysm-tlg-1.0-");
+      const isExperimental = build.build_number.startsWith("cataclysm-tlg-1.0-");
       const isStableRelease = !isExperimental && !build.prerelease;
       if (isStableRelease) return true;
       const createdAt = new Date(build.created_at);
@@ -391,7 +391,7 @@ export default async function run({ github, context, dryRun = false }) {
   }
 
   const allBuilds = existingAllBuilds.concat(newBuilds);
-  // allBuilds.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  allBuilds.sort((a, b) => b.created_at.localeCompare(a.created_at));
   const importantBuilds = filterImportantBuilds(allBuilds);
 
   const allBuildsJson = JSON.stringify(allBuilds);
@@ -466,8 +466,8 @@ export default async function run({ github, context, dryRun = false }) {
     message: commitMessage,
     tree: tree.sha,
     author: {
-      name: "HHG2C Update Bot",
-      email: "hhg2c@users.noreply.github.com",
+      name: "Panika",
+      email: "panpanika@users.noreply.github.com",
     },
   });
 
