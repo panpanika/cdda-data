@@ -255,8 +255,8 @@ export default async function run({ github, context, dryRun = false }) {
     console.log(`Fetching source...`);
 
     const { data: zip } = await github.rest.repos.downloadZipballArchive({
-      owner: "CleverRaven",
-      repo: "Cataclysm-DDA",
+      owner: "Cataclysm-TLG",
+      repo: "Cataclysm-TLG",
       ref: tag_name,
     });
 
@@ -338,8 +338,8 @@ export default async function run({ github, context, dryRun = false }) {
       console.log("Found translations")
 
       const { data: zip } = await github.rest.actions.downloadArtifact({
-        owner: "CleverRaven",
-        repo: "Cataclysm-DDA",
+        owner: "Cataclysm-TLG",
+        repo: "Cataclysm-TLG",
         artifact_id: relevantTranslationArtifact.id,
         archive_format: "zip"
       });
