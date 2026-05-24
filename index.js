@@ -8,7 +8,7 @@ const octokit = new Octokit({
 await run({
   github: octokit,
   context: {
-    repo: { owner: "nornagon", repo: "cdda-data" },
+    repo: { owner: "panpanika", repo: "cdda-data" },
   },
   dryRun: !process.env.GITHUB_TOKEN,
 });
