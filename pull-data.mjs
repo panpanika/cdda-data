@@ -120,12 +120,12 @@ export default async function run({ github, context, dryRun = false }) {
   console.log("Fetching release list...");
 
   const { data: releases } = await github.rest.repos.listReleases({
-    owner: "CleverRaven",
-    repo: "Cataclysm-DDA",
+    owner: "Cataclysm-TLG",
+    repo: "Cataclysm-TLG",
   });
 
   const latestRelease = releases.find((r) =>
-    r.tag_name.startsWith("cdda-experimental-"),
+    r.tag_name.startsWith("cataclysm-tlg-1.0-"),
   )?.tag_name;
 
   console.log(`Latest experimental: ${latestRelease}`);
@@ -200,7 +200,7 @@ export default async function run({ github, context, dryRun = false }) {
     const cutoff = new Date();
     cutoff.setUTCMonth(cutoff.getUTCMonth() - 3);
     return builds.filter((build) => {
-      const isExperimental = build.build_number.startsWith("cdda-experimental-");
+      const isExperimental = build.build_number.startsWith("cataclysm-tlg-1.0-");
       const isStableRelease = !isExperimental && !build.prerelease;
       if (isStableRelease) return true;
       const createdAt = new Date(build.created_at);
@@ -325,8 +325,8 @@ export default async function run({ github, context, dryRun = false }) {
     console.group("Downloading translations...");
 
     const translationArtifacts = await github.rest.actions.listArtifactsForRepo({
-      owner: "CleverRaven",
-      repo: "Cataclysm-DDA",
+      owner: "CCataclysm-TLG",
+      repo: "Cataclysm-TLG",
       name: "translations",
       per_page: 100
     });
@@ -480,7 +480,7 @@ export default async function run({ github, context, dryRun = false }) {
   });
 }
 
-async function retry(fn, retries = 10) {
+async function retry(fn, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
       return await fn();
