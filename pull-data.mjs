@@ -325,7 +325,7 @@ export default async function run({ github, context, dryRun = false }) {
     console.group("Downloading translations...");
 
     const translationArtifacts = await github.rest.actions.listArtifactsForRepo({
-      owner: "CCataclysm-TLG",
+      owner: "Cataclysm-TLG",
       repo: "Cataclysm-TLG",
       name: "translations",
       per_page: 100
